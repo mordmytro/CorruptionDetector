@@ -24,15 +24,15 @@ train_data = train_data.drop('target', axis=1).drop('id', axis=1).drop('CTR_CATE
 def build_model():
     model = Sequential()
     
-    model.add(Dense(16, activation='relu', input_shape=(1, )))
-    model.add(Dense(16, activation='relu'))
+    model.add(Dense(128, activation='relu', input_shape=(len(train_data.columns), )))
+    model.add(Dense(64, activation='relu'))
     model.add(Dense(1))
 
     optimizer = tf.keras.optimizers.RMSprop(0.001)
 
     model.compile(
         loss='mse',
-        optimizer=optimizer,
+        optimizer = 'adam',
         metrics=['mae', 'mse']
     )
       
@@ -63,30 +63,31 @@ def plot_history(history):
     '''
     plt.show()
 
-early_stop = keras.callbacks.EarlyStopping(monitor='loss', patience=10)
+early_stop = keras.callbacks.EarlyStopping(monitor='loss', patience=40)
 
-results = {}
+inputs = train_data
+outputs = targets
+model = build_model()
 
-for column in train_data.columns:
-    inputs = train_data[column]
-    outputs = targets
-    model = build_model()
-    
-    history = model.fit(
-        inputs,
-        outputs,
-        epochs=200,
-        validation_split = 0.2,
-        callbacks=[early_stop]
-    )
-    
-    hist = pd.DataFrame(history.history)
-    
-    results[column] = min(hist['val_mae'])
-    
-    plot_history(history)
-    
-    print(results)
-        
-    with open('data.json', 'w') as fp:
-        json.dump(results, fp)
+history = model.fit(
+    inputs,
+    outputs,
+    epochs=200,
+    validation_split = 0.1,
+    callbacks=[early_stop]
+)
+
+plot_history(history)
+
+test_predictions = model.predict(train_data.iloc[int(len(train_data)*0.9):]).flatten()
+test_labels = targets.iloc[int(len(train_data)*0.9):]
+
+plt.scatter(test_labels, test_predictions)
+plt.xlabel('True Values [MPG]')
+plt.ylabel('Predictions [MPG]')
+plt.axis('equal')
+plt.axis('square')
+plt.xlim([0,plt.xlim()[1]])
+plt.ylim([0,plt.ylim()[1]])
+_ = plt.plot([-100, 100], [-100, 100])
+plt.show()
