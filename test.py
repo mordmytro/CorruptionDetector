@@ -25,7 +25,9 @@ def build_model():
     model = Sequential()
     
     model.add(Dense(128, activation='relu', input_shape=(len(train_data.columns), )))
-    model.add(Dense(64, activation='relu'))
+    model.add(Dense(128, activation='relu'))
+    model.add(Dense(128, activation='relu'))
+    model.add(Dense(128, activation='relu'))
     model.add(Dense(1))
 
     optimizer = tf.keras.optimizers.RMSprop(0.001)
