@@ -39,7 +39,3 @@ train_data = train_data.drop('CTR_CATEGO_X', axis=1)
 
 for i in df:
     train_data.insert(num, i, df[i].values)
-
-
-
-#print(train_data['CTR_CATEGO_X'])
