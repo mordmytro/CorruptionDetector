@@ -15,7 +15,7 @@ import pandas as pd
 import numpy as np
 import json
 
-train_data = pd.read_csv('data/train.csv', index_col=None)
+train_data = pd.read_csv('data/train.csv', index_col=None).dropna(axis=1)
 #test_data = pd.read_csv('data/test.csv', index_col=None)
 
 targets = train_data['target']
@@ -63,7 +63,7 @@ def plot_history(history):
     '''
     plt.show()
 
-early_stop = keras.callbacks.EarlyStopping(monitor='val_mse', patience=10)
+early_stop = keras.callbacks.EarlyStopping(monitor='loss', patience=10)
 
 results = {}
 
