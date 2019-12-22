@@ -19,48 +19,53 @@ train_data = pd.read_csv('data/train.csv', index_col=None).dropna(axis=1)
 #test_data = pd.read_csv('data/test.csv', index_col=None)
 
 targets = train_data['target']
-train_data = train_data.drop('target', axis=1).drop('id', axis=1).drop('CTR_CATEGO_X', axis=1)
+train_data = train_data.drop('target', axis=1).drop('id', axis=1)#.drop('CTR_CATEGO_X', axis=1)
 
 #%% Edit CTR_CATEGO_X column
-
-tmp_list = []
-for i in train_data['CTR_CATEGO_X']:
-    if i not in tmp_list:
-        print(i)
-        tmp_list.append(i)
-
-print(tmp_list)
-
-dc = {}
-
-for name in tmp_list:
-    dc[name] = []
-
-for i in train_data['CTR_CATEGO_X']:
-    for j in dc:
-        if i == j:
-            dc[j].append(1)
-        else:
-            dc[j].append(0)
-
-new_list = []
-for i in dc:
-    new_list.append(dc[i])
-
-for i in range(len(tmp_list)):
-    tmp_list[i] = 'CTR_CATEGO_X' + tmp_list[i]
-    print(tmp_list[i])
-
-#print(new_list)
-
-df = pd.DataFrame(np.array(new_list).T.tolist(), columns=tmp_list)
-
-num = train_data.columns.get_loc("CTR_CATEGO_X")
-train_data = train_data.drop('CTR_CATEGO_X', axis=1)
-
-for i in df:
-    train_data.insert(num, i, df[i].values)
+def remake_column_with_symbols(data, col):
+    if col in data.columns:
+        tmp_list = []
+        for i in data[col]:
+            if i not in tmp_list:
+                #print(i)
+                tmp_list.append(i)
+        
+        tmp_list.sort()
+        print(tmp_list)
+        
+        dc = {}
+        
+        for name in tmp_list:
+            dc[name] = []
+        
+        for i in data[col]:
+            for j in dc:
+                if i == j:
+                    dc[j].append(1)
+                else:
+                    dc[j].append(0)
+        
+        new_list = []
+        for i in dc:
+            new_list.append(dc[i])
+        
+        for i in range(len(tmp_list)):
+            tmp_list[i] = col + str(tmp_list[i])
+            #print(tmp_list[i])
+        
+        #print(new_list)
+        
+        df = pd.DataFrame(np.array(new_list).T.tolist(), columns=tmp_list)
+        
+        num = data.columns.get_loc(col)
+        data = data.drop(col, axis=1)
+        
+        for i in df:
+            data.insert(num, i, df[i].values)
+    return data
 #%%
+
+train_data = remake_column_with_symbols(train_data, 'CTR_CATEGO_X')
 
 def build_model():
     model = Sequential()
