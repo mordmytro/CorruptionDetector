@@ -2,6 +2,9 @@ import pandas as pd
 import numpy as np
 
 def classify(start_data, col):
+    '''
+    Splits classification column into separate boolean columns
+    '''
     data = start_data.copy()
     if col in data.columns:
         tmp_list = []
@@ -36,6 +39,9 @@ def classify(start_data, col):
     return data
 
 def denanization(start_data, col):
+    '''
+    Splits column into is NaN boolean column and value column
+    '''
     data = start_data.copy()
     tmp_list = []
     num = data.columns.get_loc(col)
@@ -49,6 +55,9 @@ def denanization(start_data, col):
     return data
 
 def normalize(start_data, col):
+    '''
+    Normalizes data in the column
+    '''
     data = start_data.copy()
     max_val = max(data[col].values)
     min_val = min(data[col].values)
@@ -59,6 +68,9 @@ def normalize(start_data, col):
     return data
 
 def not_number_columns(data):
+    '''
+    Returns list of not number columns
+    '''
     tmp_list = []
     for i in data:
         if data[i].dtypes != float and data[i].dtypes != int:
@@ -66,6 +78,9 @@ def not_number_columns(data):
     return tmp_list
 
 def nan_columns(data):
+    '''
+    Returns list of nan-containing columns
+    '''
     tmp_list = []
     asa = []
     for i in data:
@@ -74,3 +89,6 @@ def nan_columns(data):
         else:
             asa.append(i)
     return tmp_list, asa
+
+train_data = pd.read_csv('data/train.csv', index_col=None)#.dropna(axis=1)
+print(not_number_columns(train_data))
