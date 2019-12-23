@@ -15,14 +15,16 @@ import pandas as pd
 import numpy as np
 import json
 
-train_data = pd.read_csv('data/train.csv', index_col=None).dropna(axis=1)
+train_data = pd.read_csv('data/train.csv', index_col=None)#.dropna(axis=1)
 #test_data = pd.read_csv('data/test.csv', index_col=None)
 
 targets = train_data['target']
 train_data = train_data.drop('target', axis=1).drop('id', axis=1)#.drop('CTR_CATEGO_X', axis=1)
 
 #%% Classify column
-def classify(data, col):
+
+def classify(start_data, col):
+    data = start_data.copy()
     if col in data.columns:
         tmp_list = []
         for i in data[col]:
@@ -42,8 +44,6 @@ def classify(data, col):
         new_list = []
         for i in dc:
             new_list.append(dc[i])
-        new_list1 = list(dc.keys())
-        print(new_list == new_list1)
         
         for i in range(len(tmp_list)):
             tmp_list[i] = col + str(tmp_list[i])
@@ -56,8 +56,11 @@ def classify(data, col):
         for i in df:
             data.insert(num, i, df[i].values)
     return data
+
 #%% Remove Nans and make a new boolean is_Nan column
-def denanization(data, col):
+    
+def denanization(start_data, col):
+    data = start_data.copy()
     tmp_list = []
     num = data.columns.get_loc(col)
     for i in range(len(data[col])):
@@ -67,7 +70,20 @@ def denanization(data, col):
         else:
             tmp_list.append(0)
     data.insert(num + 1, col + '_is_NaN', tmp_list)
+    #print(data)
+    return data
+
+#%% Making all list values in range from 0 to 1
+
+def normalize(start_data, col):
+    data = start_data.copy()
+    max_val = max(data[col].values)
+    min_val = min(data[col].values)
     
+    for i in range(len(data[col])):
+        data[col].iloc[i] = (data[col].iloc[i] - min_val) / (max_val - min_val)
+    
+    return data
 
 #%%
 
