@@ -1,47 +1,42 @@
 import pandas as pd
 import numpy as np
 
-train_data = pd.read_csv('data/train.csv', index_col=False)
-'''
-tmp_list = []
-for i in train_data['CTR_CATEGO_X']:
-    if i not in tmp_list:
-        print(i)
-        tmp_list.append(i)
+def classify(start_data, col):
+    data = start_data.copy()
+    if col in data.columns:
+        tmp_list = []
+        for i in data[col]:
+            if i not in tmp_list:
+                tmp_list.append(i)
+        
+        tmp_list.sort()        
+        dc = {}
+        
+        for name in tmp_list:
+            dc[name] = []
+        
+        for i in data[col]:
+            for j in dc:
+                dc[j].append(1) if i == j else dc[j].append(0)
 
-print(tmp_list)
+        new_list = []
+        for i in dc:
+            new_list.append(dc[i])
+        
+        for i in range(len(tmp_list)):
+            tmp_list[i] = col + str(tmp_list[i])
+        
+        df = pd.DataFrame(np.array(new_list).T.tolist(), columns=tmp_list)
+        
+        num = data.columns.get_loc(col)
+        data = data.drop(col, axis=1)
+        
+        for i in df:
+            data.insert(num, i, df[i].values)
+    return data
 
-dc = {}
-
-for name in tmp_list:
-    dc[name] = []
-
-for i in train_data['CTR_CATEGO_X']:
-    for j in dc:
-        if i == j:
-            dc[j].append(1)
-        else:
-            dc[j].append(0)
-
-new_list = []
-for i in dc:
-    new_list.append(dc[i])
-
-for i in range(len(tmp_list)):
-    tmp_list[i] = 'CTR_CATEGO_X' + tmp_list[i]
-    print(tmp_list[i])
-
-#print(new_list)
-
-df = pd.DataFrame(np.array(new_list).T.tolist(), columns=tmp_list)
-
-num = train_data.columns.get_loc("CTR_CATEGO_X")
-train_data = train_data.drop('CTR_CATEGO_X', axis=1)
-
-for i in df:
-    train_data.insert(num, i, df[i].values)
-'''
-def denanization(data, col):
+def denanization(start_data, col):
+    data = start_data.copy()
     tmp_list = []
     num = data.columns.get_loc(col)
     for i in range(len(data[col])):
@@ -51,34 +46,26 @@ def denanization(data, col):
         else:
             tmp_list.append(0)
     data.insert(num + 1, col + '_is_NaN', tmp_list)
-    
-    
-#denanization(train_data, 'FAC_MNTTVA_C')
+    return data
 
-'''
-def normalizing(data, col):
+def normalize(start_data, col):
+    data = start_data.copy()
     max_val = max(data[col].values)
     min_val = min(data[col].values)
-    print(min_val, max_val)
-
-    print(data[col])
     
     for i in range(len(data[col])):
         data[col].iloc[i] = (data[col].iloc[i] - min_val) / (max_val - min_val)
     
-    print(data[col])
-    
-normalizing(train_data, 'BCT_CODBUR')
-'''
+    return data
 
-def is_not_number(data):
+def not_number_columns(data):
     tmp_list = []
     for i in data:
         if data[i].dtypes != float and data[i].dtypes != int:
             tmp_list.append(i)
     return tmp_list
 
-def is_not_nan(data):
+def nan_columns(data):
     tmp_list = []
     asa = []
     for i in data:
@@ -87,5 +74,3 @@ def is_not_nan(data):
         else:
             asa.append(i)
     return tmp_list, asa
-
-print(is_not_nan(train_data))
