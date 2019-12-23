@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 
 train_data = pd.read_csv('data/train.csv', index_col=False)
+'''
 tmp_list = []
 for i in train_data['CTR_CATEGO_X']:
     if i not in tmp_list:
@@ -39,3 +40,35 @@ train_data = train_data.drop('CTR_CATEGO_X', axis=1)
 
 for i in df:
     train_data.insert(num, i, df[i].values)
+'''
+def denanization(data, col):
+    tmp_list = []
+    num = data.columns.get_loc(col)
+    for i in range(len(data[col])):
+        if np.isnan(data[col].iloc[i]):
+            tmp_list.append(1)
+            data[col].iloc[i] = 0
+        else:
+            tmp_list.append(0)
+    data.insert(num + 1, col + '_is_NaN', tmp_list)def denanization(data, col):
+    tmp_list = []
+    num = data.columns.get_loc(col)
+    for i in range(len(data[col])):
+        if np.isnan(data[col].iloc[i]):
+            tmp_list.append(1)
+            data[col].iloc[i] = 0
+        else:
+            tmp_list.append(0)
+    data.insert(num + 1, col + '_is_NaN', tmp_list)def denanization(data, col):
+    tmp_list = []
+    num = data.columns.get_loc(col)
+    for i in range(len(data[col])):
+        if np.isnan(data[col].iloc[i]):
+            tmp_list.append(1)
+            data[col].iloc[i] = 0
+        else:
+            tmp_list.append(0)
+    data.insert(num + 1, col + '_is_NaN', tmp_list)
+    
+    
+denanization(train_data, 'FAC_MNTTVA_C')

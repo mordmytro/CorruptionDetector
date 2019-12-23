@@ -21,18 +21,15 @@ train_data = pd.read_csv('data/train.csv', index_col=None).dropna(axis=1)
 targets = train_data['target']
 train_data = train_data.drop('target', axis=1).drop('id', axis=1)#.drop('CTR_CATEGO_X', axis=1)
 
-#%% Edit CTR_CATEGO_X column
-def remake_column_with_symbols(data, col):
+#%% Classify column
+def classify(data, col):
     if col in data.columns:
         tmp_list = []
         for i in data[col]:
             if i not in tmp_list:
-                #print(i)
                 tmp_list.append(i)
         
-        tmp_list.sort()
-        print(tmp_list)
-        
+        tmp_list.sort()        
         dc = {}
         
         for name in tmp_list:
@@ -40,20 +37,16 @@ def remake_column_with_symbols(data, col):
         
         for i in data[col]:
             for j in dc:
-                if i == j:
-                    dc[j].append(1)
-                else:
-                    dc[j].append(0)
-        
+                dc[j].append(1) if i == j else dc[j].append(0)
+
         new_list = []
         for i in dc:
             new_list.append(dc[i])
+        new_list1 = list(dc.keys())
+        print(new_list == new_list1)
         
         for i in range(len(tmp_list)):
             tmp_list[i] = col + str(tmp_list[i])
-            #print(tmp_list[i])
-        
-        #print(new_list)
         
         df = pd.DataFrame(np.array(new_list).T.tolist(), columns=tmp_list)
         
@@ -63,9 +56,22 @@ def remake_column_with_symbols(data, col):
         for i in df:
             data.insert(num, i, df[i].values)
     return data
+#%% Remove Nans and make a new boolean is_Nan column
+def denanization(data, col):
+    tmp_list = []
+    num = data.columns.get_loc(col)
+    for i in range(len(data[col])):
+        if np.isnan(data[col].iloc[i]):
+            tmp_list.append(1)
+            data[col].iloc[i] = 0
+        else:
+            tmp_list.append(0)
+    data.insert(num + 1, col + '_is_NaN', tmp_list)
+    
+
 #%%
 
-train_data = remake_column_with_symbols(train_data, 'CTR_CATEGO_X')
+train_data = classify(train_data, 'CTR_CATEGO_X')
 
 def build_model():
     model = Sequential()
