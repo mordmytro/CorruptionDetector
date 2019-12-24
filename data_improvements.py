@@ -45,6 +45,7 @@ def denanization(start_data, col):
     data = start_data.copy()
     tmp_list = []
     num = data.columns.get_loc(col)
+    print(num)
     for i in range(len(data[col])):
         if np.isnan(data[col].iloc[i]):
             tmp_list.append(1)
@@ -82,13 +83,7 @@ def nan_columns(data):
     Returns list of nan-containing columns
     '''
     tmp_list = []
-    asa = []
     for i in data:
         if False in data[i].notna().values:
             tmp_list.append(i)
-        else:
-            asa.append(i)
-    return tmp_list, asa
-
-train_data = pd.read_csv('data/train.csv', index_col=None)#.dropna(axis=1)
-print(not_number_columns(train_data))
+    return tmp_list#, asa

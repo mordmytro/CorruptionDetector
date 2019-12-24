@@ -16,13 +16,12 @@ import json
 
 import data_improvements as di
 
-train_data = pd.read_csv('data/train.csv', index_col=None)#.dropna(axis=1)
+train_data = pd.read_csv('data/train_converted.csv').drop('Unnamed: 0', axis=1).dropna(axis=1)
 #test_data = pd.read_csv('data/test.csv', index_col=None)
 
-targets = train_data['target']
-train_data = train_data.drop('target', axis=1).drop('id', axis=1)#.drop('CTR_CATEGO_X', axis=1)
+targets = pd.read_csv('data/train.csv', index_col=None)['target']
 
-print(di.not_number_columns(train_data))
+print(di.nan_columns(train_data))
 
 def build_model():
     model = Sequential()
@@ -68,13 +67,15 @@ def plot_history(history):
     '''
     plt.show()
 
-if __name__ != '__main__':
+if __name__ == '__main__':
 
     early_stop = keras.callbacks.EarlyStopping(monitor='loss', patience=40)
 
     inputs = train_data
     outputs = targets
     model = build_model()
+    
+    print(inputs, outputs)
 
     history = model.fit(
         inputs,
