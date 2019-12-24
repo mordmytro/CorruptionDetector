@@ -16,19 +16,28 @@ import json
 
 import data_improvements as di
 
-train_data = pd.read_csv('data/train_converted.csv').drop('Unnamed: 0', axis=1).dropna(axis=1)
+train_data = pd.read_csv('data/train_converted.csv').drop('Unnamed: 0', axis=1).dropna(axis=0)
+#train_data = pd.read_csv('data/train.csv').drop('id', axis=1).drop('target', axis=1).dropna(axis=1)
+
+#print(train_data.dtypes)
+
+#for column in di.not_number_columns(train_data):
+#    train_data = di.classify(train_data, column)
+ 
+for column in train_data.columns:
+    print(column)
+    train_data = di.normalize(train_data, column)
+    
+train_data.to_csv('data/train_converted.csv')
+
 #test_data = pd.read_csv('data/test.csv', index_col=None)
 
-targets = pd.read_csv('data/train.csv', index_col=None)['target']
-
-print(di.nan_columns(train_data))
+targets = np.array(pd.read_csv('data/train.csv', index_col=None)['target'])
 
 def build_model():
     model = Sequential()
     
-    model.add(Dense(128, activation='relu', input_shape=(len(train_data.columns), )))
-    model.add(Dense(128, activation='relu'))
-    model.add(Dense(128, activation='relu'))
+    model.add(Dense(128, activation='relu', input_shape=(len(list(train_data.columns)), )))
     model.add(Dense(128, activation='relu'))
     model.add(Dense(1))
 
@@ -46,12 +55,14 @@ def plot_history(history):
     hist = pd.DataFrame(history.history)
     hist['epoch'] = history.epoch
     
+    print(hist)
+    
     plt.figure()
     plt.xlabel('Epoch')
     plt.ylabel('Mean Abs Error [MPG]')
-    plt.plot(hist['epoch'], hist['mae'],
+    plt.plot(hist['epoch'], hist['mean_absolute_error'],
              label='Train Error')
-    plt.plot(hist['epoch'], hist['val_mae'],
+    plt.plot(hist['epoch'], hist['val_mean_absolute_error'],
              label = 'Val Error')
     plt.legend()
     
@@ -69,7 +80,7 @@ def plot_history(history):
 
 if __name__ == '__main__':
 
-    early_stop = keras.callbacks.EarlyStopping(monitor='loss', patience=40)
+    early_stop = keras.callbacks.EarlyStopping(monitor='loss', patience=20)
 
     inputs = train_data
     outputs = targets
@@ -88,7 +99,7 @@ if __name__ == '__main__':
     plot_history(history)
 
     test_predictions = model.predict(train_data.iloc[int(len(train_data)*0.9):]).flatten()
-    test_labels = targets.iloc[int(len(train_data)*0.9):]
+    test_labels = targets[int(len(train_data)*0.9):]
 
     plt.scatter(test_labels, test_predictions)
     plt.xlabel('True Values [MPG]')
@@ -97,5 +108,5 @@ if __name__ == '__main__':
     plt.axis('square')
     plt.xlim([0,plt.xlim()[1]])
     plt.ylim([0,plt.ylim()[1]])
-    _ = plt.plot([-100, 100], [-100, 100])
+    _ = plt.plot([-10000, 10000], [-10000, 10000])
     plt.show()

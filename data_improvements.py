@@ -45,7 +45,6 @@ def denanization(start_data, col):
     data = start_data.copy()
     tmp_list = []
     num = data.columns.get_loc(col)
-    print(num)
     for i in range(len(data[col])):
         if np.isnan(data[col].iloc[i]):
             tmp_list.append(1)
@@ -59,9 +58,15 @@ def normalize(start_data, col):
     '''
     Normalizes data in the column
     '''
-    data = start_data.copy()
+    data = start_data
     max_val = max(data[col].values)
     min_val = min(data[col].values)
+    
+    if max_val == min_val:
+        return
+    
+    if max_val == 1 and min_val == 0:
+        return
     
     for i in range(len(data[col])):
         data[col].iloc[i] = (data[col].iloc[i] - min_val) / (max_val - min_val)
