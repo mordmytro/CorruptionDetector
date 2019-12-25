@@ -16,32 +16,30 @@ import json
 
 import data_improvements as di
 
-#train_data = pd.read_csv('data/train_converted.csv').drop('Unnamed: 0', axis=1).dropna(axis=0)
-train_data = pd.read_csv('data/train.csv').drop('id', axis=1).drop('target', axis=1).dropna(axis=1)
+train_data = pd.read_csv('data/train_converted.csv').drop('Unnamed: 0', axis=1).dropna(axis=1)
+#train_data = pd.read_csv('data/train.csv').drop('id', axis=1).drop('target', axis=1).dropna(axis=1)
 
-#print(train_data.dtypes)
-
-#for column in di.not_number_columns(train_data):
-#    train_data = di.classify(train_data, column)
- 
-train_data = di.classify(train_data, 'CTR_CATEGO_X')
-
-for column in train_data.columns:
-    print(column)
-    train_data = di.normalize(train_data, column)
     
-train_data.to_csv('data/train_converted.csv', index=None)
+#train_data.to_csv('data/train_converted.csv')
 
 #test_data = pd.read_csv('data/test.csv', index_col=None)
 
-targets = np.array(pd.read_csv('data/train.csv', index_col=None)['target'])
+targets = list(pd.read_csv('data/train.csv', index_col=None)['target'])
+
+for i in range(len(targets)):
+    if targets[i] != 0:
+        targets[i] = (1, 0)
+    else:
+        targets[i] = (0, 1)
+
+targets = np.array(targets)
 
 def build_model():
     model = Sequential()
     
     model.add(Dense(128, activation='relu', input_shape=(len(list(train_data.columns)), )))
     model.add(Dense(128, activation='relu'))
-    model.add(Dense(1))
+    model.add(Dense(2, activation='softmax'))
 
     optimizer = tf.keras.optimizers.RMSprop(0.001)
 
