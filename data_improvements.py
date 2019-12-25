@@ -58,7 +58,7 @@ def normalize(start_data, col):
     '''
     Normalizes data in the column
     '''
-    data = start_data
+    data = start_data.copy()
     max_val = max(data[col].values)
     min_val = min(data[col].values)
     
@@ -93,7 +93,8 @@ def nan_columns(data):
             tmp_list.append(i)
     return tmp_list#, asa
 
-def compare(data):
+def compare(start_data):
+    data = start_data.copy()
     tmp = []
     for i in range(len(data.columns)):
         for j in range(i + 1, len(data.columns)):
@@ -101,4 +102,7 @@ def compare(data):
                 if data.columns[j] not in tmp:
                     tmp.append(data.columns[j])
     print(tmp)
+    #for i in tmp:
+    data = data.drop(tmp, axis=1)
+    return data
         
