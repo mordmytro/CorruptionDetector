@@ -92,3 +92,12 @@ def nan_columns(data):
         if False in data[i].notna().values:
             tmp_list.append(i)
     return tmp_list#, asa
+
+def compare(data):
+    tmp = []
+    for i in range(len(data.columns)):
+        for j in range(i + 1, len(data.columns)):
+            if False not in (data[data.columns[i]] == data[data.columns[j]]).values:
+                tmp.append(data.columns[j])
+    print(tmp)
+        
