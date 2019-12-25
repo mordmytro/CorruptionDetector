@@ -98,6 +98,7 @@ def compare(data):
     for i in range(len(data.columns)):
         for j in range(i + 1, len(data.columns)):
             if False not in (data[data.columns[i]] == data[data.columns[j]]).values:
-                tmp.append(data.columns[j])
+                if data.columns[j] not in tmp:
+                    tmp.append(data.columns[j])
     print(tmp)
         
