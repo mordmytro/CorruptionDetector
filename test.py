@@ -1,112 +1,26 @@
-from __future__ import absolute_import, division, print_function, unicode_literals
-
-# TensorFlow и tf.keras
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Dense
-
-# Вспомогательные библиотеки
-import numpy as np
-import matplotlib.pyplot as plt
-
-import pandas as pd
-import numpy as np
-import json
-
 import data_improvements as di
+import pandas as pd
 
-train_data = pd.read_csv('data/train_converted.csv').drop('Unnamed: 0', axis=1).dropna(axis=1)
+data = pd.read_csv('data/train.csv').drop('target', axis=1)
 #train_data = pd.read_csv('data/train.csv').drop('id', axis=1).drop('target', axis=1).dropna(axis=1)
 
-    
-#train_data.to_csv('data/train_converted.csv')
+print(data)
 
-#test_data = pd.read_csv('data/test.csv', index_col=None)
+for i in ['RES_ANNIMP', 'id']:
+    data = data.drop(i, axis=1)
 
-targets = list(pd.read_csv('data/train.csv', index_col=None)['target'])
+for i in ['CTR_CATEGO_X']:
+    print(1, i)
+    data = di.classify(data, i)
 
-for i in range(len(targets)):
-    if targets[i] != 0:
-        targets[i] = (1, 0)
-    else:
-        targets[i] = (0, 1)
+for i in di.nan_columns(data):
+    print(2, i)
+    data = di.denanization(data, i)
 
-targets = np.array(targets)
+for i in data.columns:
+    print(3, i)
+    data = di.normalize(data, i)
 
-def build_model():
-    model = Sequential()
-    
-    model.add(Dense(128, activation='relu', input_shape=(len(list(train_data.columns)), )))
-    model.add(Dense(128, activation='relu'))
-    model.add(Dense(2, activation='softmax'))
+data = di.compare(data)
 
-    optimizer = tf.keras.optimizers.RMSprop(0.001)
-
-    model.compile(
-        loss='mse',
-        optimizer = 'adam',
-        metrics=['mae', 'mse']
-    )
-      
-    return model
-
-def plot_history(history):
-    hist = pd.DataFrame(history.history)
-    hist['epoch'] = history.epoch
-    
-    print(hist)
-    
-    plt.figure()
-    plt.xlabel('Epoch')
-    plt.ylabel('Mean Abs Error [MPG]')
-    plt.plot(hist['epoch'], hist['mean_absolute_error'],
-             label='Train Error')
-    plt.plot(hist['epoch'], hist['val_mean_absolute_error'],
-             label = 'Val Error')
-    plt.legend()
-    
-    '''
-    plt.figure()
-    plt.xlabel('Epoch')
-    plt.ylabel('Mean Square Error [$MPG^2$]')
-    plt.plot(hist['epoch'], hist['mse'],
-             label='Train Error')
-    plt.plot(hist['epoch'], hist['val_mse'],
-             label = 'Val Error')
-    plt.legend()
-    '''
-    plt.show()
-
-if __name__ == '__main__':
-
-    early_stop = keras.callbacks.EarlyStopping(monitor='loss', patience=20)
-
-    inputs = train_data
-    outputs = targets
-    model = build_model()
-    
-    print(inputs, outputs)
-
-    history = model.fit(
-        inputs,
-        outputs,
-        epochs=200,
-        validation_split = 0.1,
-        callbacks=[early_stop]
-    )
-
-    plot_history(history)
-
-    test_predictions = model.predict(train_data.iloc[int(len(train_data)*0.9):]).flatten()
-    test_labels = targets[int(len(train_data)*0.9):]
-
-    plt.scatter(test_labels, test_predictions)
-    plt.xlabel('True Values [MPG]')
-    plt.ylabel('Predictions [MPG]')
-    plt.axis('equal')
-    plt.axis('square')
-    plt.xlim([0,plt.xlim()[1]])
-    plt.ylim([0,plt.ylim()[1]])
-    _ = plt.plot([-10000, 10000], [-10000, 10000])
-    plt.show()
+data.to_csv('data/train_converted.csv')

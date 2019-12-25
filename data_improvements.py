@@ -63,10 +63,10 @@ def normalize(start_data, col):
     min_val = min(data[col].values)
     
     if max_val == min_val:
-        return
+        return data
     
     if max_val == 1 and min_val == 0:
-        return
+        return data
     
     for i in range(len(data[col])):
         data[col].iloc[i] = (data[col].iloc[i] - min_val) / (max_val - min_val)
