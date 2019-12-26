@@ -1,8 +1,11 @@
 import data_improvements as di
 import pandas as pd
 
-data = pd.read_csv('data/train.csv').drop('target', axis=1)
+train_data = pd.read_csv('data/train.csv').drop('target', axis=1)
+test_data = pd.read_csv('data/test.csv')#.drop('target', axis=1)
 #train_data = pd.read_csv('data/train.csv').drop('id', axis=1).drop('target', axis=1).dropna(axis=1)
+
+data, ind = di.append_data(train_data, test_data)
 
 to_classify = ['CTR_CATEGO_X', 'CTR_CESSAT', 'CTR_OBLDIR', 'CTR_OBLACP', 
                'CTR_OBLRES', 'CTR_OBLFOP', 'CTR_OBLTFP', 'CTR_OBLDCO', 
@@ -34,4 +37,10 @@ for i in data.columns:
 
 data = di.compare(data)
 
-data.to_csv('data/train_converted.csv')
+train_data_converted = data[:ind]
+test_data_converted = data[ind:]
+
+print(train_data_converted)
+print(test_data_converted)
+
+#data.to_csv('data/test_converted.csv')

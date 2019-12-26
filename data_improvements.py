@@ -118,4 +118,10 @@ def compare(start_data):
     #for i in tmp:
     data = data.drop(tmp, axis=1)
     return data
+
+def append_data(start_data1, start_data2):
+    df1 = start_data1
+    df2 = start_data2
+    
+    return df1.append(df2), len(start_data1)
         
