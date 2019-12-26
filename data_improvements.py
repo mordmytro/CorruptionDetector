@@ -124,4 +124,10 @@ def append_data(start_data1, start_data2):
     df2 = start_data2
     
     return df1.append(df2), len(start_data1)
+
+def one_or_null(start_data, col):
+    data = start_data.copy()
+    for i in range(len(data[col])):
+        data[col].iloc[i] = 0 if data[col].iloc[i] == 0 else 1
+    return data
         

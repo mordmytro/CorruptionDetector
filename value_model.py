@@ -95,7 +95,7 @@ def build_value_model():
     history = model.fit(
         inputs,
         outputs,
-        epochs=100,
+        epochs=1500,
         validation_split=0.2,
         #callbacks=[early_stop]
     )
