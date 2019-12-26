@@ -95,7 +95,7 @@ def build_value_model():
     history = model.fit(
         inputs,
         outputs,
-        epochs=30,
+        epochs=100,
         validation_split=0.2,
         #callbacks=[early_stop]
     )
@@ -139,8 +139,6 @@ def build_value_model():
     print('---------------------------------')
     """
 
-    return model
-
     error = test_predictions.T[0] - test_labels
     plt.hist(error, bins = 25)
     plt.xlabel("Prediction Error [MPG]")
@@ -156,6 +154,8 @@ def build_value_model():
     plt.ylim([0,plt.ylim()[1]])
     plt.plot([-10000, 10000], [-10000, 10000])
     plt.show()
+
+    return model
 
 if __name__ == '__main__':
     build_value_model()
