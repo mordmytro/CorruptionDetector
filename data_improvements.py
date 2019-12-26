@@ -5,16 +5,21 @@ def classify(start_data, col):
     '''
     Splits classification column into separate boolean columns
     '''
+
     data = start_data.copy()
     if col in data.columns:
         tmp_list = []
+        
+        data[col] = data[col].fillna('NaN')
+        
         for i in data[col]:
             if i not in tmp_list:
                 tmp_list.append(i)
-        
-        tmp_list.sort()        
+
+        #tmp_list.sort()
         dc = {}
         
+
         for name in tmp_list:
             dc[name] = []
         
@@ -43,6 +48,7 @@ def denanization(start_data, col):
     '''
     Splits column into is NaN boolean column and value column
     '''
+    
     data = start_data.copy()
     tmp_list = []
     num = data.columns.get_loc(col)
@@ -59,6 +65,7 @@ def normalize(start_data, col):
     '''
     Normalizes data in the column
     '''
+    
     data = start_data.copy()
     max_val = max(data[col].values)
     min_val = min(data[col].values)
@@ -78,6 +85,7 @@ def not_number_columns(data):
     '''
     Returns list of not number columns
     '''
+    
     tmp_list = []
     for i in data:
         if data[i].dtypes != float and data[i].dtypes != int:
@@ -88,6 +96,7 @@ def nan_columns(data):
     '''
     Returns list of nan-containing columns
     '''
+    
     tmp_list = []
     for i in data:
         if False in data[i].notna().values:
@@ -95,6 +104,9 @@ def nan_columns(data):
     return tmp_list#, asa
 
 def compare(start_data):
+    '''
+    Returns DataFrame without repeatable columns 
+    '''
     data = start_data.copy()
     tmp = []
     for i in range(len(data.columns)):
