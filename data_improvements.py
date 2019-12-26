@@ -35,6 +35,7 @@ def classify(start_data, col):
         data = data.drop(col, axis=1)
         
         for i in df:
+            print(num, i, df[i].values)
             data.insert(num, i, df[i].values)
     return data
 
