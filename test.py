@@ -43,4 +43,5 @@ test_data_converted = data[ind:]
 print(train_data_converted)
 print(test_data_converted)
 
-#data.to_csv('data/test_converted.csv')
+train_data_converted.to_csv('data/train_converted.csv')
+test_data_converted.to_csv('data/test_converted.csv')
