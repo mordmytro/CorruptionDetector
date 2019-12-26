@@ -104,7 +104,6 @@ def build_classification_model():
 
     #plot_history(history)
 
-    
     def test_coef(coef = 0.5):
         test_predictions = model.predict(train_data.iloc[int(len(train_data)*0.7):])
         test_labels = targets[int(len(train_data)*0.7):]
