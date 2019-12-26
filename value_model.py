@@ -23,6 +23,7 @@ train_data = pd.read_csv('data/train_converted.csv').drop('Unnamed: 0', axis=1).
 #test_data = pd.read_csv('data/test.csv', index_col=None)
 
 targets = list(pd.read_csv('data/train.csv', index_col=None)['target'])
+'''
 corrupted_data = []
 corrupted_targets = []
 
@@ -33,6 +34,7 @@ for i in range(len(targets)):
 
 train_data = pd.DataFrame(corrupted_data).reset_index(drop=True)
 targets = np.array(corrupted_targets)
+'''
 
 def build_model():
     model = Sequential()
@@ -82,7 +84,7 @@ def plot_history(history):
 
 def build_value_model():
 
-    early_stop = keras.callbacks.EarlyStopping(monitor='loss', patience=25)
+    early_stop = keras.callbacks.EarlyStopping(monitor='val_mean_absolute_error', patience=25)
 
     inputs = train_data
     outputs = targets
@@ -93,14 +95,15 @@ def build_value_model():
     history = model.fit(
         inputs,
         outputs,
-        epochs=300,
-        callbacks=[early_stop]
+        epochs=30,
+        validation_split=0.2,
+        #callbacks=[early_stop]
     )
 
     #plot_history(history)
 
-    test_predictions = model.predict(train_data.iloc[int(len(train_data)*0.7):])
-    test_labels = targets[int(len(train_data)*0.7):]
+    test_predictions = np.array(model.predict(train_data.iloc[int(len(train_data)*0.2):]))
+    test_labels = np.array(targets[int(len(train_data)*0.2):])
 
     """
     good_predicted_good = 0
@@ -137,6 +140,12 @@ def build_value_model():
     """
 
     return model
+
+    error = test_predictions.T[0] - test_labels
+    plt.hist(error, bins = 25)
+    plt.xlabel("Prediction Error [MPG]")
+    plt.ylabel("Count")
+    plt.show()
     
     plt.scatter(test_labels, test_predictions)
     plt.xlabel('True Values [MPG]')
@@ -145,7 +154,7 @@ def build_value_model():
     plt.axis('square')
     plt.xlim([0,plt.xlim()[1]])
     plt.ylim([0,plt.ylim()[1]])
-    _ = plt.plot([-10000, 10000], [-10000, 10000])
+    plt.plot([-10000, 10000], [-10000, 10000])
     plt.show()
 
 if __name__ == '__main__':
