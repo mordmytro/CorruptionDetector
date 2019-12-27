@@ -127,10 +127,11 @@ def append_data(start_data1, start_data2):
 
 def one_or_null(start_data, col):
     data = start_data.copy()
-    tmp_list = []
-    num = data.columns.get_loc(col)
-    for i in range(len(data[col])):
-        tmp_list.append(0) if data[col].iloc[i] == 0 else tmp_list.append(1)
-    data.insert(num + 1, col + '_OneOrZero', tmp_list)
+    if col in data.columns:
+        tmp_list = []
+        num = data.columns.get_loc(col)
+        for i in range(len(data[col])):
+            tmp_list.append(0) if data[col].iloc[i] == 0 else tmp_list.append(1)
+        data.insert(num + 1, col + '_OneOrZero', tmp_list)
     return data
         

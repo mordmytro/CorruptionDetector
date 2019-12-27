@@ -40,9 +40,12 @@ def build_model():
     model = Sequential()
     
     model.add(Dense(128, activation='relu', input_shape=(len(list(train_data.columns)), ), kernel_regularizer=keras.regularizers.l2(0.001)))
+    model.add(Dropout(0.5))
     model.add(Dense(128, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
     model.add(Dropout(0.5))
     model.add(Dense(64, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
+    model.add(Dropout(0.5)) 
+    model.add(Dense(32, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
     model.add(Dense(1))
 
     optimizer = tf.keras.optimizers.RMSprop(0.001)
@@ -64,9 +67,9 @@ def plot_history(history):
     plt.figure()
     plt.xlabel('Epoch')
     plt.ylabel('Mean Abs Error [MPG]')
-    plt.plot(hist['epoch'], hist['mean_absolute_error'],
+    plt.plot(hist['epoch'], hist['mae'],
              label='Train Error')
-    plt.plot(hist['epoch'], hist['val_mean_absolute_error'],
+    plt.plot(hist['epoch'], hist['val_mae'],
              label = 'Val Error')
     plt.legend()
     
@@ -95,12 +98,12 @@ def build_value_model():
     history = model.fit(
         inputs,
         outputs,
-        epochs=1500,
+        epochs=350,
         validation_split=0.2,
         #callbacks=[early_stop]
     )
 
-    #plot_history(history)
+    plot_history(history)
 
     test_predictions = np.array(model.predict(train_data.iloc[int(len(train_data)*0.2):]))
     test_labels = np.array(targets[int(len(train_data)*0.2):])

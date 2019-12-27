@@ -14,6 +14,21 @@ to_classify = ['CTR_CATEGO_X', 'CTR_CESSAT', 'CTR_OBLDIR', 'CTR_OBLACP',
                'CTR_OBLTHO', 'CTR_OBLDLI', 'CTR_OBLTVI', 'CTR_RATISS',
                'EXE_EXERCI', 'TVA_MOIDEB', 'TVA_MOIFIN']
 
+to_zero_or_one = []
+"""'TVA_CHAFF6', 'TVA_CHAFF7', 'TVA_CHAF10', 'TVA_CHAF12',
+'TVA_CAF125', 'TVA_CHAF15', 'TVA_CHAF18', 'TVA_CHAF22', 
+'TVA_CHAF29', 'TVA_CHAF36', 'TVA_TOTDUE', 'TVA_CRDINI', 
+'TVA_BASIMB', 'TVA_DEDIMB', 'TVA_BASEQL', 'TVA_DEDEQL',
+'TVA_BASEQI', 'TVA_DEDEQI', 'TVA_BASAUL', 'TVA_DEDAUL', 
+'TVA_BASAUI', 'TVA_DEDAUI', 'TVA_BASRSM', 'TVA_RSNRES', 
+'TVA_TRSPOR', 'TVA_DEDREG', 'TVA_RESTIT', 'TVA_MNTPAY',
+'TVA_MOIFIN', 'TVA_CRDFIN', 'TVA_ACHSUS', 'TVA_ACHEXO',
+'']"""
+
+for i in data.columns:
+    if i.startswith('TVA_') or i.startswith('AX'):
+        to_zero_or_one.append(i)
+
 unkown = ['BCT_CODBUR', 'FJU_CODFJU']
 
 to_drop = ['RES_ANNIMP', 'id']
@@ -31,8 +46,12 @@ for i in di.nan_columns(data):
     print(2, i)
     data = di.denanization(data, i)
 
-for i in data.columns:
+for i in to_zero_or_one:
     print(3, i)
+    data = di.one_or_null(data, i)
+
+for i in data.columns:
+    print(4, i)
     data = di.normalize(data, i)
 
 data = di.compare(data)
