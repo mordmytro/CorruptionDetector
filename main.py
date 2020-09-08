@@ -5,17 +5,17 @@ import numpy as np
 from classification_model import build_classification_model
 from value_model import build_value_model
 
-#classification_model = build_classification_model()
+# classification_model = build_classification_model()
 value_model = build_value_model()
 
-#test_data = train_data.iloc[int(len(train_data)*0.7):]
-#test_labels = targets[int(len(train_data)*0.7):]
+# test_data = train_data.iloc[int(len(train_data)*0.7):]
+# test_labels = targets[int(len(train_data)*0.7):]
 
-test_data = pd.read_csv('data/test_converted.csv').drop('Unnamed: 0', axis=1)
+test_data = pd.read_csv("data/test_converted.csv").drop("Unnamed: 0", axis=1)
 predictions = value_model.predict(test_data).T[0]
 
 
-'''
+"""
 class_predictions = [(0 if prediction[0] > 0.8 else 1) for prediction in classification_model.predict(test_data)]
 predictions = []
 for i in range(len(class_predictions)):
@@ -23,8 +23,11 @@ for i in range(len(class_predictions)):
         predictions.append(0)
     else:
         predictions.append(value_model.predict(np.array([test_data.values[i]]))[0, 0])
-'''
+"""
 
-df = pd.DataFrame({'id': [f'test_id{i}' for i in range(len(predictions))], 'target': predictions})
-df = df.set_index('id')
-df.to_csv('data/submission.csv', index='id')
+df = pd.DataFrame(
+    {"id": [f"test_id{i}" for i in range(len(predictions))], "target": predictions}
+)
+df = df.set_index("id")
+df.to_csv("data/submission.csv", index="id")
+

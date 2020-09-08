@@ -16,14 +16,16 @@ import json
 
 import data_improvements as di
 
-train_data = pd.read_csv('data/train_converted.csv').drop('Unnamed: 0', axis=1).dropna(axis=1)
-#train_data = pd.read_csv('data/train.csv').drop('id', axis=1).drop('target', axis=1).dropna(axis=1)
+train_data = (
+    pd.read_csv("data/train_converted.csv").drop("Unnamed: 0", axis=1).dropna(axis=1)
+)
+# train_data = pd.read_csv('data/train.csv').drop('id', axis=1).drop('target', axis=1).dropna(axis=1)
 
-#train_data.to_csv('data/train_converted.csv')
-#test_data = pd.read_csv('data/test.csv', index_col=None)
+# train_data.to_csv('data/train_converted.csv')
+# test_data = pd.read_csv('data/test.csv', index_col=None)
 
-targets = list(pd.read_csv('data/train.csv', index_col=None)['target'])
-'''
+targets = list(pd.read_csv("data/train.csv", index_col=None)["target"])
+"""
 corrupted_data = []
 corrupted_targets = []
 
@@ -34,46 +36,55 @@ for i in range(len(targets)):
 
 train_data = pd.DataFrame(corrupted_data).reset_index(drop=True)
 targets = np.array(corrupted_targets)
-'''
+"""
+
 
 def build_model():
     model = Sequential()
-    
-    model.add(Dense(128, activation='relu', input_shape=(len(list(train_data.columns)), ), kernel_regularizer=keras.regularizers.l2(0.001)))
+
+    model.add(
+        Dense(
+            128,
+            activation="relu",
+            input_shape=(len(list(train_data.columns)),),
+            kernel_regularizer=keras.regularizers.l2(0.001),
+        )
+    )
     model.add(Dropout(0.5))
-    model.add(Dense(128, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
+    model.add(
+        Dense(128, activation="relu", kernel_regularizer=keras.regularizers.l2(0.001))
+    )
     model.add(Dropout(0.5))
-    model.add(Dense(64, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
-    model.add(Dropout(0.5)) 
-    model.add(Dense(32, activation='relu', kernel_regularizer=keras.regularizers.l2(0.001)))
+    model.add(
+        Dense(64, activation="relu", kernel_regularizer=keras.regularizers.l2(0.001))
+    )
+    model.add(Dropout(0.5))
+    model.add(
+        Dense(32, activation="relu", kernel_regularizer=keras.regularizers.l2(0.001))
+    )
     model.add(Dense(1))
 
     optimizer = tf.keras.optimizers.RMSprop(0.001)
 
-    model.compile(
-        loss='mse',
-        optimizer = 'adam',
-        metrics=['mae', 'mse']
-    )
-      
+    model.compile(loss="mse", optimizer="adam", metrics=["mae", "mse"])
+
     return model
+
 
 def plot_history(history):
     hist = pd.DataFrame(history.history)
-    hist['epoch'] = history.epoch
-    
+    hist["epoch"] = history.epoch
+
     print(hist)
-    
+
     plt.figure()
-    plt.xlabel('Epoch')
-    plt.ylabel('Mean Abs Error [MPG]')
-    plt.plot(hist['epoch'], hist['mae'],
-             label='Train Error')
-    plt.plot(hist['epoch'], hist['val_mae'],
-             label = 'Val Error')
+    plt.xlabel("Epoch")
+    plt.ylabel("Mean Abs Error [MPG]")
+    plt.plot(hist["epoch"], hist["mae"], label="Train Error")
+    plt.plot(hist["epoch"], hist["val_mae"], label="Val Error")
     plt.legend()
-    
-    '''
+
+    """
     plt.figure()
     plt.xlabel('Epoch')
     plt.ylabel('Mean Square Error [$MPG^2$]')
@@ -82,17 +93,20 @@ def plot_history(history):
     plt.plot(hist['epoch'], hist['val_mse'],
              label = 'Val Error')
     plt.legend()
-    '''
+    """
     plt.show()
+
 
 def build_value_model():
 
-    early_stop = keras.callbacks.EarlyStopping(monitor='val_mean_absolute_error', patience=25)
+    early_stop = keras.callbacks.EarlyStopping(
+        monitor="val_mean_absolute_error", patience=25
+    )
 
     inputs = train_data
     outputs = targets
     model = build_model()
-    
+
     print(inputs, str(outputs), len(outputs))
 
     history = model.fit(
@@ -100,13 +114,15 @@ def build_value_model():
         outputs,
         epochs=350,
         validation_split=0.2,
-        #callbacks=[early_stop]
+        # callbacks=[early_stop]
     )
 
     plot_history(history)
 
-    test_predictions = np.array(model.predict(train_data.iloc[int(len(train_data)*0.2):]))
-    test_labels = np.array(targets[int(len(train_data)*0.2):])
+    test_predictions = np.array(
+        model.predict(train_data.iloc[int(len(train_data) * 0.2) :])
+    )
+    test_labels = np.array(targets[int(len(train_data) * 0.2) :])
 
     """
     good_predicted_good = 0
@@ -143,22 +159,23 @@ def build_value_model():
     """
 
     error = test_predictions.T[0] - test_labels
-    plt.hist(error, bins = 25)
+    plt.hist(error, bins=25)
     plt.xlabel("Prediction Error [MPG]")
     plt.ylabel("Count")
     plt.show()
-    
+
     plt.scatter(test_labels, test_predictions)
-    plt.xlabel('True Values [MPG]')
-    plt.ylabel('Predictions [MPG]')
-    plt.axis('equal')
-    plt.axis('square')
-    plt.xlim([0,plt.xlim()[1]])
-    plt.ylim([0,plt.ylim()[1]])
+    plt.xlabel("True Values [MPG]")
+    plt.ylabel("Predictions [MPG]")
+    plt.axis("equal")
+    plt.axis("square")
+    plt.xlim([0, plt.xlim()[1]])
+    plt.ylim([0, plt.ylim()[1]])
     plt.plot([-10000, 10000], [-10000, 10000])
     plt.show()
 
     return model
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     build_value_model()
